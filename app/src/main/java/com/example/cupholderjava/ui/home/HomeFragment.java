@@ -36,7 +36,6 @@ public class HomeFragment extends Fragment {
         super.onStart();
         Button resetButton = getView().findViewById(R.id.resetButton);
         resetButton.setOnClickListener(v -> System.out.println("Test") );
-
     }
 
     @Override

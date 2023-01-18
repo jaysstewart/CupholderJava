@@ -33,10 +33,16 @@ public class DashboardFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ProgressBar bar = getView().findViewById(R.id.waterBar);
-        bar.setProgress(10);
+    public void onStart() {
+        super.onStart();
+        ProgressBar waterBar = getView().findViewById(R.id.waterBar);
+        waterBar.setProgress(30);
+
+        TextView fillPercent = getView().findViewById(R.id.fillPercent);
+        CharSequence str = "30%";
+        fillPercent.setText(str);
+
+
     }
 
     @Override
