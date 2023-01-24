@@ -29,14 +29,22 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        final ProgressBar waterBar = getView().findViewById(R.id.waterBar);
-        waterBar.setProgress(30);
-
-        final TextView fillPercent = getView().findViewById(R.id.percent);
-        CharSequence str = "30%";
-        fillPercent.setText(str);
+        setWaterProgress(80);
     }
 
+    // Updates water progress bar and precentage
+    public void setWaterProgress(int progress){
+        // progress can not exceed 100%
+        if (progress > 100) {
+            progress = 100;
+        }
+
+        final TextView fillPercent = getView().findViewById(R.id.percent);
+        final ProgressBar waterBar = getView().findViewById(R.id.waterBar);
+        waterBar.setProgress(progress);
+        CharSequence str = progress + "%";
+        fillPercent.setText(str);
+    }
 
     @Override
     public void onDestroyView() {
