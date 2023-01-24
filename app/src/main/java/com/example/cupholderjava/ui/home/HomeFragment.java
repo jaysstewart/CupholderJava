@@ -8,9 +8,11 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.cupholderjava.MainActivity;
 import com.example.cupholderjava.R;
 import com.example.cupholderjava.databinding.FragmentHomeBinding;
 
@@ -32,10 +34,22 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         Button resetButton = getView().findViewById(R.id.resetButton);
-        resetButton.setOnClickListener(v -> System.out.println("Test") );
+        resetButton.setOnClickListener(v -> System.out.println("test"));
+    }
+
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        Button resetButton = getView().findViewById(R.id.resetButton);
+//        resetButton.setOnClickListener(v -> test() );
+//    }
+
+    public void test() {
+        MainActivity mainActivity = new MainActivity();
+        mainActivity.showNotification("Title", "Message test");
     }
 
     @Override

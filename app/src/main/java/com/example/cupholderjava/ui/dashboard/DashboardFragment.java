@@ -46,6 +46,8 @@ public class DashboardFragment extends Fragment {
         fillPercent.setText(str);
     }
 
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
