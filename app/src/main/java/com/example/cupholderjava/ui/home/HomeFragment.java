@@ -34,25 +34,6 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Button resetButton = getView().findViewById(R.id.resetButton);
-        resetButton.setOnClickListener(v -> System.out.println("test"));
-    }
-
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        Button resetButton = getView().findViewById(R.id.resetButton);
-//        resetButton.setOnClickListener(v -> test() );
-//    }
-
-    public void test() {
-        MainActivity mainActivity = new MainActivity();
-        mainActivity.showNotification("Title", "Message test");
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;

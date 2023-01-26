@@ -32,7 +32,7 @@ public class DashboardFragment extends Fragment {
         setWaterProgress(80);
     }
 
-    // Updates water progress bar and precentage
+    // Updates water progress bar and percentage
     public void setWaterProgress(int progress){
         // progress can not exceed 100%
         if (progress > 100) {
