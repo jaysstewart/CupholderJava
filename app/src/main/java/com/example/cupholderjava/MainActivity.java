@@ -1,5 +1,6 @@
 package com.example.cupholderjava;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
 
         reset = findViewById(R.id.resetButton);
-        reset.setOnClickListener(v -> createNotification());
+        reset.setOnClickListener(v -> createNotification("title", "content"));
 
     }
 
@@ -62,62 +63,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void createNotification() {
+    @SuppressLint("MissingPermission")
+    public void createNotification(String title, String content) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, "Notification")
-                .setContentTitle("Title")
-                .setContentText("Content")
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.drawable.baseline_opacity_24)
                 .setAutoCancel(true);
 
         NotificationManagerCompat managerCompat = NotificationManagerCompat.from(MainActivity.this);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
         managerCompat.notify(1, builder.build());
     }
-
-//    private void createNotificationChannel() {
-//        // Create the NotificationChannel, but only on API 26+ because
-//        // the NotificationChannel class is new and not in the support library
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            CharSequence name = getString(R.string.app_name);
-//            String description = getString(R.string.title_home);
-//            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-//            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-//            channel.setDescription(description);
-//            // Register the channel with the system; you can't change the importance
-//            // or other notification behaviors after this
-//            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-//            notificationManager.createNotificationChannel(channel);
-//        }
-//    }
-//
-//    public void showNotification(String title, String message) {
-//        NotificationManager mNotificationManager =
-//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-//                    "YOUR_CHANNEL_NAME",
-//                    NotificationManager.IMPORTANCE_DEFAULT);
-//            channel.setDescription("YOUR_NOTIFICATION_CHANNEL_DESCRIPTION");
-//            mNotificationManager.createNotificationChannel(channel);
-//        }
-//        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-//                .setSmallIcon(R.mipmap.ic_launcher) // notification icon
-//                .setContentTitle(title) // title for notification
-//                .setContentText(message)// message for notification
-//                .setAutoCancel(true); // clear notification after click
-//        Intent intent = new Intent(this, MainActivity.class);
-//        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-//        mBuilder.setContentIntent(pi);
-//        mNotificationManager.notify(0, mBuilder.build());
-//    }
 }
 
