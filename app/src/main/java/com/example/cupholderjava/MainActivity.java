@@ -1,5 +1,7 @@
 package com.example.cupholderjava;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,6 +15,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
@@ -23,6 +26,7 @@ import android.widget.ProgressBar;
 import com.example.cupholderjava.ui.dashboard.DashboardFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContract;
@@ -43,16 +47,32 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
+    BluetoothManager bluetoothManager;
+    BluetoothAdapter bluetoothAdapter;
+
     private ActivityMainBinding binding;
     Button reset;
 
-    private BroadcastReceiver myReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Message msg = Message.obtain();
             String action = intent.getAction();
-            if(BluetoothDevice.ACTION_FOUND.equals(action)){
-                //Found, add to a device list
+            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+                switch (state) {
+                    case BluetoothAdapter.STATE_OFF:
+                        Log.d(TAG, "onRecieve: STATE OFF");
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_OFF:
+                        Log.d(TAG, "onRecieve: STATE TURNING OFF");
+                        break;
+                    case BluetoothAdapter.STATE_ON:
+                        Log.d(TAG, "onRecieve: STATE ON");
+                        break;
+                    case BluetoothAdapter.STATE_TURNING_ON:
+                        Log.d(TAG, "onRecieve: STATE TURNING on");
+                        break;
+                }
             }
         }
     };
@@ -63,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         createNotificationChannel();
+
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -78,7 +99,11 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
 
         reset = findViewById(R.id.resetButton);
-        reset.setOnClickListener(v -> bluetooth());
+        reset.setOnClickListener(v -> enableBT());
+
+        Button paired = findViewById(R.id.pairedButton);
+        paired.setOnClickListener(v -> paired());
+
 
     }
 
@@ -105,24 +130,38 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     public void bluetooth() {
-        BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
-        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+        bluetoothManager = getSystemService(BluetoothManager.class);
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-        makeDiscoverable();
-        bluetoothAdapter.startDiscovery();
 
-        if (bluetoothAdapter == null) {
-            return;
-        }
+//        makeDiscoverable();
+//        bluetoothAdapter.startDiscovery();
+//
+//        if (bluetoothAdapter == null) {
+//            System.out.println("Fail");
+//            return;
+//        }
+//
 
+
+    }
+
+    private void paired() {
+        bluetoothManager = getSystemService(BluetoothManager.class);
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        @SuppressLint("MissingPermission") Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
+                if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+
+                Log.d(TAG, "Permission failed!!!!!!");
+                    return;
+                }
                 String deviceName = device.getName();
                 String deviceHardwareAddress = device.getAddress();
+                System.out.println(deviceName);
             }
         }
-
     }
 
     @SuppressLint("MissingPermission")
@@ -133,14 +172,34 @@ public class MainActivity extends AppCompatActivity {
         Log.i("Log", "Discoverable ");
     }
 
-    public boolean createBond(BluetoothDevice btDevice)
-            throws Exception
-    {
-        Class class1 = Class.forName("android.bluetooth.BluetoothDevice");
-        Method createBondMethod = class1.getMethod("createBond");
-        Boolean returnValue = (Boolean) createBondMethod.invoke(btDevice);
-        return returnValue.booleanValue();
+//    public boolean createBond(BluetoothDevice btDevice)
+//            throws Exception {
+//        Class class1 = Class.forName("android.bluetooth.BluetoothDevice");
+//        Method createBondMethod = class1.getMethod("createBond");
+//        Boolean returnValue = (Boolean) createBondMethod.invoke(btDevice);
+//        return returnValue.booleanValue();
+//    }
+
+    @SuppressLint("MissingPermission")
+    public void enableBT() {
+
+        bluetoothManager = getSystemService(BluetoothManager.class);
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (bluetoothAdapter == null) {
+            Log.d(TAG, "enableDisableBT: Does not have BT capabilites");
+        }
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivity(intent);
+
+            IntentFilter BtIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+            registerReceiver(mReceiver, BtIntent);
+        }
+
+
     }
+
 }
 
 
