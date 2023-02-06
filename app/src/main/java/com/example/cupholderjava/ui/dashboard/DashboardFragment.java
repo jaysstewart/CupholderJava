@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ import com.example.cupholderjava.databinding.FragmentDashboardBinding;
 
 public class DashboardFragment extends Fragment {
 
+    private int waterProgress = 0;
     private FragmentDashboardBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -29,7 +31,13 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        setWaterProgress(80);
+        Button inc = getView().findViewById(R.id.incButton);
+        inc.setOnClickListener(v -> incProgress());
+    }
+
+    public void incProgress() {
+        waterProgress += 10;
+        setWaterProgress(waterProgress);
     }
 
     // Updates water progress bar and percentage
