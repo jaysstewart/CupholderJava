@@ -14,6 +14,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.bluetooth.le.ScanCallback;
@@ -26,16 +27,19 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.cupholderjava.Connect;
 import com.example.cupholderjava.Device;
 import com.example.cupholderjava.R;
 import com.example.cupholderjava.databinding.FragmentSettingsBinding;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class SettingsFragment extends Fragment {
 
     private FragmentSettingsBinding binding;
+    private final Connect connect = new Connect();
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
     private boolean scanning;
@@ -59,34 +63,27 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        //registerReceiver()
 
         recycler();
         Button scan = getView().findViewById(R.id.ScanButton);
         scan.setOnClickListener(v -> scanLeDevice());
 
         Button update = getView().findViewById(R.id.UpdateButton);
-        update.setOnClickListener(v -> test());
+        update.setOnClickListener(v -> recycler());
     }
 
     public void recycler() {
+        HashSet<String> set = new HashSet<>();
+        deviceList.removeIf(p -> !set.add(p.getDeviceName()));
+
         RecyclerView recyclerView = getView().findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new RecyclerAdapter(getContext(), deviceList));
-    }
-
-    public void test() {
-
-        deviceList.add(new Device("Name", "112233"));
-        RecyclerView recyclerView = getView().findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new RecyclerAdapter(getContext(), deviceList));
+        recyclerView.setAdapter(new RecyclerAdapter(getContext(), deviceList, connect));
     }
 
     @SuppressLint("MissingPermission")
     private void scanLeDevice() {
         if (!scanning) {
-            System.out.println("You working?");
             // Stops scanning after a predefined scan period.
             handler.postDelayed(new Runnable() {
                 @Override
@@ -103,9 +100,6 @@ public class SettingsFragment extends Fragment {
             bluetoothLeScanner.stopScan(leScanCallback);
         }
 
-        RecyclerView recyclerView = getView().findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new RecyclerAdapter(getContext(), deviceList));
     }
 
 
@@ -118,7 +112,10 @@ public class SettingsFragment extends Fragment {
                     super.onScanResult(callbackType, result);
                     String name = result.getDevice().getName();
                     String address = result.getDevice().getAddress();
-                    deviceList.add(new Device(name, address));
+                    if (name != null) {
+                        deviceList.add(new Device(name, address));
+                    }
+                    recycler();
                 }
             };
 

@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
+        android:background="?android:attr/selectableItemBackground"
         android:textSize="20dp"
         tools:text="DeviceName" />
 
