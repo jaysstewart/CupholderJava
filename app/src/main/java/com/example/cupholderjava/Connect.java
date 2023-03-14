@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
@@ -14,138 +16,85 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Connect {
 
+    private final static byte START = 0x1;
+    private final static byte LED_COMMAND = 0x4;
+
+    private final static byte VALUE_OFF = 0x0;
+    private final static byte VALUE_ON = (byte)0xFF;
+
+    String address;
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothGatt bluetoothGatt;
+    private BluetoothGattCharacteristic bluetoothGattChar = null;
+
+    private byte[] createControlWord(Byte type, byte ... args) {
+        byte[] command = new byte[args.length +3];
+        command[0] = START;
+        command[1] = type;
+        command[2] = (byte)args.length;
+        for(int i = 0; i < args.length; i++) {
+            command[i+3] = args[i];
+        }
+        return command;
+    }
 
     private final BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
+        @SuppressLint("MissingPermission")
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 // successfully connected to the GATT Server
+                Log.d("GattCallBack:", "Connected to Gatt Server");
+                bluetoothGatt.discoverServices();
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 // disconnected from the GATT Server
+                Log.d("GattCallBack:", "Disconnected from Gatt Server");
+            }
+        }
+
+        @SuppressLint("MissingPermission")
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            if(null == bluetoothGattChar) {
+                for (int i = 0; i < gatt.getServices().size(); i++) {
+                    System.out.println(gatt.getServices().get(i).getUuid());
+                    for (int j = 0; j < gatt.getServices().get(i).getCharacteristics().size(); j++) {
+                        System.out.println((gatt.getServices().get(i).getCharacteristics().get(j).getUuid()));
+                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10001-e8f2-537e-4f6c-d104768a1214")) ) {
+                            bluetoothGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
+                            System.out.println("did i get here????");
+                        }
+                    }
+                }
             }
         }
     };
 
-    @SuppressLint("MissingPermission")
+
+@SuppressLint("MissingPermission")
     public void gattConnect(final String address, Context context) {
+        this.address = address;
         try {
             final BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
             bluetoothGatt = device.connectGatt(context,false, bluetoothGattCallback);
         } catch (Exception e) {}
     }
-//
-//    static BluetoothSocket mmSocket;
-//    static Handler handler;
-//    static InputStream mmInStream;
-//    static OutputStream mmOutStream;
-//
-//    private final static int CONNECTING_STATUS = 1; // used in bluetooth handler to identify message status
-//    private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
-//
-//
-//    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//
-//
-//    @SuppressLint("MissingPermission")
-//    public void CreateConnectThread(String address) {
-//        BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
-//        //bluetoothDevice.createBond();
-//        //UUID uuid = bluetoothDevice.getUuids()[0].getUuid();
-////        BluetoothSocket tmp = null;
-////        try {
-////            tmp = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
-////        } catch (IOException e) {
-////            Log.e("CCT", "Sockets create() method failed", e);
-////        }
-//        mmSocket = tmp;
-//        ConnectToThread();
-//    }
-//
-//    @SuppressLint("MissingPermission")
-//    public void ConnectToThread() {
-//        try {
-//            // Connect to the remote device through the socket. This call blocks
-//            // until it succeeds or throws an exception.
-//            mmSocket.connect();
-//            Log.e("Status", "Device connected");
-//            handler.obtainMessage(CONNECTING_STATUS, 1, -1).sendToTarget();
-//        } catch (IOException connectException) {
-//            // Unable to connect; close the socket and return.
-//            try {
-//                mmSocket.close();
-//                Log.e("Status", "Cannot connect to device");
-//                handler.obtainMessage(CONNECTING_STATUS, -1, -1).sendToTarget();
-//            } catch (IOException closeException) {
-//                Log.e("CTT", "Could not close the client socket", closeException);
-//            }
-//            return;
-//        }
-//        ConnectedThread();
-//    }
-//
-//    public void ConnectedThread() {
-//        // Get the input and output streams, using temp objects because
-//        // member streams are final
-//        InputStream tmpIn = null;
-//        OutputStream tmpOut = null;
-//
-//        try {
-//            tmpIn = mmSocket.getInputStream();
-//            tmpOut = mmSocket.getOutputStream();
-//        } catch (IOException e) { }
-//
-//        mmInStream = tmpIn;
-//        mmOutStream = tmpOut;
-//        run();
-//    }
-//
-//
-//    public void run() {
-//        byte[] buffer = new byte[1024];  // buffer store for the stream
-//        int bytes = 0; // bytes returned from read()
-//        // Keep listening to the InputStream until an exception occurs
-//        while (true) {
-//            try {
-//                    /*
-//                    Read from the InputStream from Arduino until termination character is reached.
-//                    Then send the whole String message to GUI Handler.
-//                     */
-//                buffer[bytes] = (byte) mmInStream.read();
-//                String readMessage;
-//                if (buffer[bytes] == '\n'){
-//                    readMessage = new String(buffer,0,bytes);
-//                    Log.e("Arduino Message",readMessage);
-//                    handler.obtainMessage(MESSAGE_READ,readMessage).sendToTarget();
-//                    bytes = 0;
-//                } else {
-//                    bytes++;
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                break;
-//            }
-//        }
-//    }
-//
-//    public void write(String input) {
-//        byte[] bytes = input.getBytes(); //converts entered String into bytes
-//        try {
-//            mmOutStream.write(bytes);
-//        } catch (IOException e) {
-//            Log.e("Send Error","Unable to send message",e);
-//        }
-//    }
-//
-//    public void closeConnection() {
-//        try {
-//            mmSocket.close();
-//        } catch (IOException e) {}
-//    }
 
+
+    @SuppressLint("MissingPermission")
+    public void sendData(byte[] msg) {
+        System.out.println(bluetoothGatt + " send data METHOD");
+        bluetoothGattChar.setValue(msg);
+        bluetoothGatt.writeCharacteristic(bluetoothGattChar);
+    }
+
+    public void switchLED(boolean on){
+        sendData(createControlWord(LED_COMMAND, on?VALUE_ON:VALUE_OFF));
+    }
 }

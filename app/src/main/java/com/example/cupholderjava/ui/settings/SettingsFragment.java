@@ -13,12 +13,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.bluetooth.le.ScanCallback;
 import android.widget.Button;
+import android.widget.Scroller;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,6 +50,8 @@ public class SettingsFragment extends Fragment {
     List<Device> deviceList = new ArrayList<>();
     private static final long SCAN_PERIOD = 10000;
 
+    TextView terminal;
+
     @SuppressLint("MissingPermission")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -68,8 +73,11 @@ public class SettingsFragment extends Fragment {
         Button scan = getView().findViewById(R.id.ScanButton);
         scan.setOnClickListener(v -> scanLeDevice());
 
-        Button update = getView().findViewById(R.id.UpdateButton);
-        update.setOnClickListener(v -> recycler());
+        Button LED = getView().findViewById(R.id.LedButton);
+        LED.setOnClickListener(v -> connect.switchLED(true));
+
+        terminal = getView().findViewById(R.id.terminal);
+        terminal.setMovementMethod(new ScrollingMovementMethod());
     }
 
     public void recycler() {
@@ -90,13 +98,16 @@ public class SettingsFragment extends Fragment {
                 public void run() {
                     scanning = false;
                     bluetoothLeScanner.stopScan(leScanCallback);
+                    terminal.append("Stopping scan \n");
                 }
             }, SCAN_PERIOD);
 
             scanning = true;
+            terminal.append("Scanning for devices... \n");
             bluetoothLeScanner.startScan(leScanCallback);
         } else {
             scanning = false;
+            terminal.append("Stopping scan \n");
             bluetoothLeScanner.stopScan(leScanCallback);
         }
 
@@ -118,10 +129,6 @@ public class SettingsFragment extends Fragment {
                     recycler();
                 }
             };
-
-
-
-
 
     @SuppressLint("MissingPermission")
     @Override
