@@ -65,8 +65,8 @@ public class Connect {
                 for (int i = 0; i < gatt.getServices().size(); i++) {
                     System.out.println(gatt.getServices().get(i).getUuid());
                     for (int j = 0; j < gatt.getServices().get(i).getCharacteristics().size(); j++) {
-                        System.out.println((gatt.getServices().get(i).getCharacteristics().get(j).getUuid()));
-                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10001-e8f2-537e-4f6c-d104768a1214")) ) {
+                        //System.out.println((gatt.getServices().get(i).getCharacteristics().get(j).getUuid()));
+                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10004-e8f2-537e-4f6c-d104768a1214")) ) {
                             bluetoothGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
                             System.out.println("did i get here????");
                         }
