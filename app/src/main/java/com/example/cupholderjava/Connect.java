@@ -59,21 +59,22 @@ public class Connect {
         @SuppressLint("MissingPermission")
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            if(null == bluetoothGattChar) {
+            if (null == bluetoothGattChar) {
                 for (int i = 0; i < gatt.getServices().size(); i++) {
                     System.out.println(gatt.getServices().get(i).getUuid());
                     for (int j = 0; j < gatt.getServices().get(i).getCharacteristics().size(); j++) {
                         //System.out.println((gatt.getServices().get(i).getCharacteristics().get(j).getUuid()));
-                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10004-e8f2-537e-4f6c-d104768a1214")) ) {
+                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10004-e8f2-537e-4f6c-d104768a1214"))) {
                             weightGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
                         }
-                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10003-e8f2-537e-4f6c-d104768a1214")) ) {
+                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10003-e8f2-537e-4f6c-d104768a1214"))) {
                             errorGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
                         }
-                            if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10004-e8f2-537e-4f6c-d104768a1214")) ) {
+                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10004-e8f2-537e-4f6c-d104768a1214"))) {
                             dataGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
                         }
 
+                    }
                 }
             }
         }
