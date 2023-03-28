@@ -6,32 +6,30 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.os.Handler;
 import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class Connect {
 
     private final static byte START = 0x1;
     private final static byte LED_COMMAND = 0x4;
-
     private final static byte VALUE_OFF = 0x0;
     private final static byte VALUE_ON = (byte)0xFF;
+
+    private final static String KEY = "ccefjclqrxqrtxcefijlqcertxccetfixxfijlqllqcrttrrifijlefcqlftxijl";
 
     String address;
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothGatt bluetoothGatt;
-    private BluetoothGattCharacteristic bluetoothGattChar = null;
+    private static BluetoothGattCharacteristic bluetoothGattChar = null;
+    private static BluetoothGattCharacteristic weightGattChar = null;
+    private static BluetoothGattCharacteristic dataGattChar = null;
+    private static BluetoothGattCharacteristic errorGattChar = null;
+
 
     private byte[] createControlWord(Byte type, byte ... args) {
         byte[] command = new byte[args.length +3];
@@ -67,10 +65,15 @@ public class Connect {
                     for (int j = 0; j < gatt.getServices().get(i).getCharacteristics().size(); j++) {
                         //System.out.println((gatt.getServices().get(i).getCharacteristics().get(j).getUuid()));
                         if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10004-e8f2-537e-4f6c-d104768a1214")) ) {
-                            bluetoothGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
-                            System.out.println("did i get here????");
+                            weightGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
                         }
-                    }
+                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10003-e8f2-537e-4f6c-d104768a1214")) ) {
+                            errorGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
+                        }
+                            if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10004-e8f2-537e-4f6c-d104768a1214")) ) {
+                            dataGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
+                        }
+
                 }
             }
         }
@@ -94,7 +97,38 @@ public class Connect {
         bluetoothGatt.writeCharacteristic(bluetoothGattChar);
     }
 
-    public void switchLED(boolean on){
-        sendData(createControlWord(LED_COMMAND, on?VALUE_ON:VALUE_OFF));
+    String oneTimePad(String binary, String binaryKey) {
+        String ciphertextBinary = "";
+
+        // XOR respective bits of binary plaintext and key and append to ciphertext binary string
+        for (int i = 0; i < binary.length(); i++) {
+            if ((binary.charAt(i) == '0' && binaryKey.charAt(i) == '1') || (binary.charAt(i) == '1' && binaryKey.charAt(i) == '0')) {
+                ciphertextBinary += '1';
+            } else {
+                ciphertextBinary += '0';
+            }
+        }
+
+        return ciphertextBinary;
+    }
+
+    String stringToBinary(String s) {
+        byte[] bytes = s.getBytes();
+        StringBuilder binary = new StringBuilder();
+        for (byte b : bytes)
+        {
+            int val = b;
+            for (int i = 0; i < 8; i++)
+            {
+                binary.append((val & 128) == 0 ? 0 : 1);
+                val <<= 1;
+            }
+        }
+        return binary.toString();
+    }
+
+    public void switchLED(boolean on) {
+        String msg = "confirm";
+        sendData(msg.getBytes());
     }
 }

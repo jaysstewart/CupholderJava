@@ -114,22 +114,6 @@ public class MainActivity extends AppCompatActivity {
         NotificationManagerCompat managerCompat = NotificationManagerCompat.from(MainActivity.this);
         managerCompat.notify(1, builder.build());
     }
-
-//    @SuppressLint("MissingPermission")
-//    public void bluetooth() {
-//        bluetoothManager = getSystemService(BluetoothManager.class);
-//        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//
-//
-//    }
-//
-//    @SuppressLint("MissingPermission")
-//    private void makeDiscoverable() {
-//        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-//        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-//        startActivity(discoverableIntent);
-//        Log.i("Log", "Discoverable ");
-//    }
 }
 
 
