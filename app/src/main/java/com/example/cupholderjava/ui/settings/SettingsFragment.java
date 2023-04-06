@@ -32,17 +32,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cupholderjava.Connect;
 import com.example.cupholderjava.Device;
+import com.example.cupholderjava.MainActivity;
 import com.example.cupholderjava.R;
 import com.example.cupholderjava.databinding.FragmentSettingsBinding;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
 public class SettingsFragment extends Fragment {
 
     private FragmentSettingsBinding binding;
-    private final Connect connect = new Connect();
+    public static Connect connect = MainActivity.connect;
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
     private boolean scanning;
@@ -72,9 +74,6 @@ public class SettingsFragment extends Fragment {
         recycler();
         Button scan = getView().findViewById(R.id.ScanButton);
         scan.setOnClickListener(v -> scanLeDevice());
-
-        Button LED = getView().findViewById(R.id.LedButton);
-        LED.setOnClickListener(v -> connect.switchLED(true));
 
         terminal = getView().findViewById(R.id.terminal);
         terminal.setMovementMethod(new ScrollingMovementMethod());

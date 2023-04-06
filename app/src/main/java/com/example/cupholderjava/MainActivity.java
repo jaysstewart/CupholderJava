@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     BluetoothManager bluetoothManager;
     BluetoothAdapter bluetoothAdapter;
 
+    public static Connect connect = new Connect();
+
     private ActivityMainBinding binding;
     Button reset;
 
@@ -86,12 +88,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
 
         reset = findViewById(R.id.resetButton);
-        //reset.setOnClickListener(v -> enableBT());
-
-        Button paired = findViewById(R.id.pairedButton);
-        //paired.setOnClickListener(v -> paired());
-
-
     }
 
     // Notification channel is required for newer android versions

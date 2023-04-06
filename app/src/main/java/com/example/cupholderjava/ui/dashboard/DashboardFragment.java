@@ -1,5 +1,6 @@
 package com.example.cupholderjava.ui.dashboard;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,13 +12,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.cupholderjava.Connect;
+import com.example.cupholderjava.MainActivity;
 import com.example.cupholderjava.R;
 import com.example.cupholderjava.databinding.FragmentDashboardBinding;
+import com.example.cupholderjava.ui.settings.SettingsFragment;
 
 public class DashboardFragment extends Fragment {
 
-    private int waterProgress = 0;
+    private static int waterProgress = 0;
     private FragmentDashboardBinding binding;
+
+    public static Connect connect = MainActivity.connect;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -28,11 +34,18 @@ public class DashboardFragment extends Fragment {
         return root;
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onStart() {
         super.onStart();
-        Button inc = getView().findViewById(R.id.incButton);
-        inc.setOnClickListener(v -> incProgress());
+
+
+        connect.sendData("abcdefg");
+//        TextView weight = getView().findViewById(R.id.weight);
+//
+        System.out.println(connect.bluetoothGatt.readCharacteristic(connect.weightGattChar));
+
+        setWaterProgress(waterProgress);
     }
 
     public void incProgress() {
@@ -53,8 +66,6 @@ public class DashboardFragment extends Fragment {
         CharSequence str = progress + "%";
         fillPercent.setText(str);
     }
-
-
 
     @Override
     public void onDestroyView() {

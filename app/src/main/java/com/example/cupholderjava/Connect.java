@@ -24,11 +24,11 @@ public class Connect {
 
     String address;
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-    private BluetoothGatt bluetoothGatt;
-    private static BluetoothGattCharacteristic bluetoothGattChar = null;
-    private static BluetoothGattCharacteristic weightGattChar = null;
-    private static BluetoothGattCharacteristic dataGattChar = null;
-    private static BluetoothGattCharacteristic errorGattChar = null;
+    public BluetoothGatt bluetoothGatt;
+    public static BluetoothGattCharacteristic bluetoothGattChar = null;
+    public static BluetoothGattCharacteristic weightGattChar = null;
+    public static BluetoothGattCharacteristic dataGattChar = null;
+    public static BluetoothGattCharacteristic errorGattChar = null;
 
 
     private byte[] createControlWord(Byte type, byte ... args) {
@@ -62,18 +62,17 @@ public class Connect {
             if (null == bluetoothGattChar) {
                 for (int i = 0; i < gatt.getServices().size(); i++) {
                     System.out.println(gatt.getServices().get(i).getUuid());
-                    for (int j = 0; j < gatt.getServices().get(i).getCharacteristics().size(); j++) {
-                        //System.out.println((gatt.getServices().get(i).getCharacteristics().get(j).getUuid()));
-                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10004-e8f2-537e-4f6c-d104768a1214"))) {
+                    for (int j = 0; j < gatt.getServices().get(i).getCharacteristics().size(); j++) {;
+                        System.out.println(gatt.getServices().get(i).getCharacteristics().get(j).getUuid());
+                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19B10001-E8F2-537E-4F6C-D104768A1214"))) {
                             weightGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
                         }
-                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10003-e8f2-537e-4f6c-d104768a1214"))) {
+                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19B10003-E8F2-537E-4F6C-D104768A1214"))) {
                             errorGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
                         }
-                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19b10004-e8f2-537e-4f6c-d104768a1214"))) {
+                        if (gatt.getServices().get(i).getCharacteristics().get(j).getUuid().equals(UUID.fromString("19B10004-E8F2-537E-4F6C-D104768A1214"))) {
                             dataGattChar = gatt.getServices().get(i).getCharacteristics().get(j);
                         }
-
                     }
                 }
             }
@@ -91,11 +90,11 @@ public class Connect {
     }
 
 
-    @SuppressLint("MissingPermission")
-    public void sendData(byte[] msg) {
-        System.out.println(bluetoothGatt + " send data METHOD");
-        bluetoothGattChar.setValue(msg);
-        bluetoothGatt.writeCharacteristic(bluetoothGattChar);
+    @SuppressLint({"MissingPermission"})
+    public void sendData(String msg) {
+        //System.out.println(dataGattChar.getValue());
+        byte[] poop = {0};
+        bluetoothGatt.writeCharacteristic(dataGattChar, poop, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
     }
 
     String oneTimePad(String binary, String binaryKey) {
@@ -128,8 +127,4 @@ public class Connect {
         return binary.toString();
     }
 
-    public void switchLED(boolean on) {
-        String msg = "confirm";
-        sendData(msg.getBytes());
-    }
 }
