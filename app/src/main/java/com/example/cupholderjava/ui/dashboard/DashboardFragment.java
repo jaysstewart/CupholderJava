@@ -43,7 +43,7 @@ public class DashboardFragment extends Fragment {
         connect.sendData("abcdefg");
 //        TextView weight = getView().findViewById(R.id.weight);
 //
-        System.out.println(connect.bluetoothGatt.readCharacteristic(connect.weightGattChar));
+//        System.out.println(connect.bluetoothGatt.readCharacteristic(connect.weightGattChar));
 
         setWaterProgress(waterProgress);
     }

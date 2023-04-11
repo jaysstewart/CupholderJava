@@ -1,5 +1,7 @@
 package com.example.cupholderjava;
 
+import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT16;
+
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -9,6 +11,8 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -77,6 +81,12 @@ public class Connect {
                 }
             }
         }
+
+        @Override
+        public void onCharacteristicRead(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic, @NonNull byte[] value, int status) {
+            super.onCharacteristicRead(gatt, characteristic, value, status);
+            System.out.println(value.toString());
+        }
     };
 
 
@@ -92,9 +102,13 @@ public class Connect {
 
     @SuppressLint({"MissingPermission"})
     public void sendData(String msg) {
-        //System.out.println(dataGattChar.getValue());
-        byte[] poop = {0};
-        bluetoothGatt.writeCharacteristic(dataGattChar, poop, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+        byte[] value = new byte[1];
+        value[0] = (byte) 21;
+        dataGattChar.setWriteType(FORMAT_UINT16);
+        bluetoothGatt.writeCharacteristic(dataGattChar, value, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+
+
+//        dataGattChar.getValue();
     }
 
     String oneTimePad(String binary, String binaryKey) {
