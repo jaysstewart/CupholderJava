@@ -39,12 +39,11 @@ public class DashboardFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
+        Button test = getView().findViewById(R.id.buttonTest);
+        test.setOnClickListener(v -> connect.read());
 
-        connect.sendData("abcdefg");
-//        TextView weight = getView().findViewById(R.id.weight);
-//
-//        System.out.println(connect.bluetoothGatt.readCharacteristic(connect.weightGattChar));
-
+        connect.sendData("1");
+        waterProgress = 0;
         setWaterProgress(waterProgress);
     }
 

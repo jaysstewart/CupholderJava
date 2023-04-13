@@ -85,6 +85,8 @@ public class Connect {
         @Override
         public void onCharacteristicRead(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic, @NonNull byte[] value, int status) {
             super.onCharacteristicRead(gatt, characteristic, value, status);
+            System.out.println("Did i get here");
+            System.out.println(status);
             System.out.println(value.toString());
         }
     };
@@ -102,13 +104,15 @@ public class Connect {
 
     @SuppressLint({"MissingPermission"})
     public void sendData(String msg) {
-        byte[] value = new byte[1];
-        value[0] = (byte) 21;
-        dataGattChar.setWriteType(FORMAT_UINT16);
-        bluetoothGatt.writeCharacteristic(dataGattChar, value, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-
+        bluetoothGatt.writeCharacteristic(dataGattChar, msg.getBytes(), BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+        bluetoothGatt.readCharacteristic(weightGattChar);
 
 //        dataGattChar.getValue();
+    }
+
+    @SuppressLint("MissingPermission")
+    public void read() {
+        bluetoothGatt.readCharacteristic(weightGattChar);
     }
 
     String oneTimePad(String binary, String binaryKey) {
